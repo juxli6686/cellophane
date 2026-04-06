@@ -1,0 +1,20 @@
+[package]
+name = "cellophane"
+version = "0.1.0"
+edition = "2024"
+description = "A terminal animation framework for Rust"
+license = "MIT"
+repository = "https://github.com/km-clay/cellophane"
+readme = "README.md"
+keywords = ["terminal", "animation", "tui", "ansi"]
+categories = ["command-line-interface"]
+
+
+[dependencies]
+bitflags = "2.11.0"
+crossterm = "0.29.0"
+log = "0.4.29"
+smallvec = "1.15.1"
+unicode-segmentation = "1.13.2"
+unicode-width = "0.2.2"
+vte = { version = "0.15.0", features = ["ansi"] }

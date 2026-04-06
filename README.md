@@ -3,6 +3,8 @@
 A terminal animation framework for Rust. Implement one trait, get a complete
 rendering pipeline with frame diffing, resize handling, and input forwarding.
 
+![cellophane](https://github.com/user-attachments/assets/541ccc80-a115-4893-80a1-daa7278210ed)
+
 ## Features
 
 - **One trait** — implement `Animation` and you're done

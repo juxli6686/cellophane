@@ -1,6 +1,5 @@
 use std::{
-  io::{self, Stdout, Write},
-  time::{Duration, Instant},
+  collections::VecDeque, io::{self, Stdout, Write}, time::{Duration, Instant}
 };
 
 use crossterm::{cursor, event::Event, execute, queue, terminal};
@@ -15,16 +14,20 @@ use crate::{CellFlags, frame::Frame};
 ///
 /// Terminal resize and input events are forwarded automatically by the `Animator`.
 pub trait Animation {
-  /// Initialize the animation. Internally calls [`init_with`](Animation::init_with) with the frame from [`initial_frame`](Animation::initial_frame).
-	/// Override [`initial_frame`](Animation::initial_frame) to customize the initial frame content.
+/// Initialize the animation.
+///
+/// Internally calls [`init_with`](Animation::init_with) with the frame from [`initial_frame`](Animation::initial_frame). Override [`initial_frame`](Animation::initial_frame) to customize the initial frame content.
   fn init(&mut self) {
 		self.init_with(self.initial_frame());
 	}
 
-	/// Initialize the animation with a specific frame. By default, this is called by [`init`](Animation::init) with the frame from [`initial_frame`](Animation::initial_frame), but you can override it to customize the initialization process.
+	/// Initialize the animation with a specific frame.
+	///
+	/// By default, this is called by [`init`](Animation::init) with the frame from [`initial_frame`](Animation::initial_frame), but you can override it to customize the initialization process.
 	fn init_with(&mut self, initial: Frame);
 
   /// Produce the initial frame to pass to [`init`](Animation::init).
+	///
   /// Override this to seed the animation with custom content.
   /// Defaults to a blank frame matching the current terminal size.
   fn initial_frame(&self) -> Frame {
@@ -32,6 +35,7 @@ pub trait Animation {
   }
 
   /// Advance the animation by one frame.
+	///
   /// Returns the frame to render.
   fn update(&mut self) -> Frame;
 
@@ -102,6 +106,7 @@ pub struct Animator {
   last_cols: u16,
   last_rows: u16,
   out_channel: Stdout,
+	queued_events: VecDeque<Event>
 }
 
 impl Animator {
@@ -118,6 +123,7 @@ impl Animator {
       last_cols,
       last_rows,
       out_channel: io::stdout(),
+			queued_events: VecDeque::new()
     }
   }
 
@@ -158,8 +164,19 @@ impl Animator {
   pub fn tick(&mut self) -> io::Result<bool> {
     let tick_start = Instant::now();
 
-    if crossterm::event::poll(Duration::ZERO).unwrap_or(false) {
-      let event = crossterm::event::read()?;
+    if crossterm::event::poll(Duration::ZERO).unwrap_or(false)
+		|| !self.queued_events.is_empty() {
+      let event = match crossterm::event::read() {
+				Ok(e) => e,
+				Err(e) => {
+					// crossterm did not give us an event, let's see if we have any events queued
+					let Some(event) = self.queued_events.pop_front() else {
+						// if we are here then we hit an actual io error in the read() call
+						return Err(e);
+					};
+					event
+				}
+			};
       match event {
         Event::Resize(cols, rows) => {
           if cols != self.last_cols || rows != self.last_rows {
@@ -201,6 +218,15 @@ impl Animator {
     Ok(self.animation().is_running())
   }
 
+	/// Enqueue an event to be processed on the next tick.
+	///
+	/// This allows you to inject events from outside the terminal event loop, such as from another thread or a timer.
+	/// `crossterm` events can only be read once, so if your program reads them directly (e.g. via `crossterm::event::read`), you can forward them to the `Animator` using this method to ensure they are processed by the animation.
+	pub fn enqueue_event(&mut self, event: Event) {
+		self.queued_events.push_back(event);
+	}
+
+	/// Get a reference to the underlying animation.
   pub fn animation(&self) -> &dyn Animation {
     &*self.animation
   }

@@ -1,6 +1,6 @@
 [package]
 name = "cellophane"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 description = "A terminal animation framework for Rust"
 license = "MIT"
@@ -14,7 +14,11 @@ categories = ["command-line-interface"]
 bitflags = "2.11.0"
 crossterm = "0.29.0"
 log = "0.4.29"
+ratatui = { version = "0.30.0", optional = true }
 smallvec = "1.15.1"
 unicode-segmentation = "1.13.2"
 unicode-width = "0.2.2"
 vte = { version = "0.15.0", features = ["ansi"] }
+
+[features]
+ratatui = ["dep:ratatui"]

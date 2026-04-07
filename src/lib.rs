@@ -73,10 +73,60 @@
 //! hiding the cursor, frame-rate limiting, frame diffing (only changed cells
 //! are redrawn), terminal resize events, Ctrl+C handling, and terminal
 //! restoration on drop.
+//!
+//! ## [ratatui](ratatui) Integration
+//!
+//! Enable with:
+//! ```sh
+//! cargo add cellophane --features=ratatui
+//! ```
+//!
+//! This feature flag exposes the `AnimationWidget` struct, which allows `Frame` to be usable in the `ratatui` rendering pipeline.
+//! `AnimationWidget` implements the `Widget` trait so it can be composed with other `ratatui` widgets as you would expect.
+//! Here's an example using the `Block` widget:
+//! ```rust
+//! fn main() -> std::io::Result<()> {
+//!   let mut anim = SomeAnimation::new();
+//!   anim.init(anim.initial_frame());
+//!
+//!   ratatui::run(|terminal| {
+//!     loop {
+//!       terminal.draw(|f| {
+//!         let chunks = Layout::default()
+//!           .direction(Direction::Horizontal)
+//!           .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+//!           .split(f.area());
+//!
+//!         let block = Block::default().title("Animation").borders(ratatui::widgets::Borders::ALL);
+//!         let block_inner = block.inner(chunks[0]);
+//!
+//!         // resize the animation to match block_inner
+//!         anim.resize(block_inner.width as usize, block_inner.height as usize);
+//!         let anim_frame = anim.update(); // get the frame
+//!
+//!         // render the block widget, and the animation frame inside of it
+//!         f.render_widget(block, chunks[0]);
+//!         f.render_widget(AnimationWidget::new(&anim_frame), block_inner);
+//!       })?;
+//!
+//!       if event::poll(Duration::from_millis(16))? {
+//!         if event::read()?.is_key_press() {
+//!           break Ok(());
+//!         }
+//!       }
+//!     }
+//!   })
+//! }
+//! ```
 
 pub(crate) mod animator;
 pub(crate) mod frame;
 
+#[cfg(feature = "ratatui")]
+pub(crate) mod ratatui_widget;
+
 pub use animator::{Animation, Animator};
-pub use frame::{Frame, FrameBuilder, Cell, CellFlags, Grapheme, to_graphemes};
 pub use crossterm;
+pub use frame::{Cell, CellFlags, Frame, FrameBuilder, Grapheme, to_graphemes};
+#[cfg(feature = "ratatui")]
+pub use ratatui_widget::AnimationWidget;

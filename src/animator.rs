@@ -191,6 +191,7 @@ impl Animator {
 	}
 
 	#[allow(clippy::needless_range_loop)]
+	/// Render the given frame to the terminal, diffing against the last rendered frame to minimize updates.
 	fn render(&mut self, frame: Frame) -> io::Result<()> {
 		let cells = frame.into_cells();
 		let rows = cells.len();
@@ -201,17 +202,11 @@ impl Animator {
 
 		for row in 0..rows {
 			for col in 0..cols {
-				if let Some(last_frame) = self.last_frame.as_ref() {
-					if last_frame.get_cell(row, col) != Some(&cells[row][col]) {
-						// move to row, col, write the cell
-						let cell = &cells[row][col];
-						if cell.flags().contains(CellFlags::WIDE_CONTINUATION) {
-							continue
-						}
-						queue!(self.out_channel, cursor::MoveTo(col as u16, row as u16))?;
-						write!(self.out_channel, "{cell}")?;
-					}
-				} else {
+				let changed = self.last_frame
+					.as_ref()
+					.is_none_or(|f| f.get_cell(row, col) != Some(&cells[row][col]));
+
+				if changed {
 					let cell = &cells[row][col];
 					if cell.flags().contains(CellFlags::WIDE_CONTINUATION) {
 						continue

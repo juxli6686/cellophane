@@ -164,18 +164,12 @@ impl Animator {
   pub fn tick(&mut self) -> io::Result<bool> {
     let tick_start = Instant::now();
 
-    if crossterm::event::poll(Duration::ZERO).unwrap_or(false)
-		|| !self.queued_events.is_empty() {
-      let event = match crossterm::event::read() {
-				Ok(e) => e,
-				Err(e) => {
-					// crossterm did not give us an event, let's see if we have any events queued
-					let Some(event) = self.queued_events.pop_front() else {
-						// if we are here then we hit an actual io error in the read() call
-						return Err(e);
-					};
-					event
-				}
+		let has_event = crossterm::event::poll(Duration::ZERO).unwrap_or(false);
+    if has_event || !self.queued_events.is_empty() {
+      let event = if has_event {
+				crossterm::event::read().unwrap()
+			} else {
+				self.queued_events.pop_front().unwrap()
 			};
       match event {
         Event::Resize(cols, rows) => {

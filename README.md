@@ -5,6 +5,8 @@ rendering pipeline with frame diffing, resize handling, and input forwarding.
 
 ![cellophane](https://github.com/user-attachments/assets/541ccc80-a115-4893-80a1-daa7278210ed)
 
+<sub>Animation provided by [whoa](https://github.com/km-clay/whoa)</sub>
+
 ## Features
 
 - **One trait** - implement `Animation` and you're done

